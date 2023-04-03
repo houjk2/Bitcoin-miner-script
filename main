@@ -1,0 +1,95 @@
+
+local players = game:GetService("Players")
+local player = players.LocalPlayer
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Bitcoin Miner Gui by RoSploits", "DarkTheme")
+
+local tabs = {
+    main = Window:NewTab("main"),
+    teleport = Window:NewTab("teleport"),
+    credits = Window:NewTab("credits")
+}
+
+local sections = {
+    autofarm = tabs.main:NewSection("AutoFarm"),
+    teleport = tabs.teleport:NewSection("Teleports")
+}
+
+local teleportpos = {
+    spawn = CFrame.new(153, 7, 93),
+    future = CFrame.new(-144, 27, 13864),
+    hsvshop = CFrame.new(40, 7, -1085),
+    
+}
+
+local toggles = {
+    autobestalgorithm = false
+}
+
+
+-- Main 
+
+sections.autofarm:NewToggle("Auto Choose Best Algorithm", "Automatically uses the best algorithm for maxium profit", function(toggle) 
+    toggles.autobestalgorithm = toggle
+end)
+
+-- Teleport 
+
+local tpoptions = {}
+
+for i, v in pairs(teleportpos) do 
+    tpoptions[#tpoptions + 1] = i
+end
+
+sections.teleport:NewDropdown("Choose Teleport", "Teleport to your desired position", tpoptions, function(tp) 
+    if player.Character then 
+        player.Character.HumanoidRootPart.CFrame = teleportpos[tp]
+    end
+end)
+
+sections.teleport:NewButton("To Plot", "Teleport to your activated plot", function()
+    for i, v in pairs(game:GetService("Workspace"):GetChildren()) do 
+        if v:FindFirstChild("Owned") then 
+            if v.Owned.Value == true then 
+                if v.Sign.wr.SurfaceGui.Text.Text == player.Name.."'s plot" then 
+                    if player.Character then 
+                        player.Character.HumanoidRootPart.CFrame = v.Frame.CFrame * CFrame.new(0, 20, 0)
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- funcs
+
+function choosebest()
+    local highest = 0
+    
+    for i, v in pairs(player.PlayerGui.NewUi.UiButtons.SubButtonsContainer.SubButtonsMenu.Algorithms.AlgStore:GetChildren()) do 
+        if v.ClassName == "TextButton" then 
+            if tonumber(v.Rate.Text:split("x")[1]) > highest then
+                highest = tonumber(v.Rate.Text:split("x")[1])
+            end
+        end
+    end
+    
+    for i, v in pairs(player.PlayerGui.NewUi.UiButtons.SubButtonsContainer.SubButtonsMenu.Algorithms.AlgStore:GetChildren()) do 
+        if v.ClassName == "TextButton" then 
+            if tonumber(v.Rate.Text:split("x")[1]) == highest then
+                highest = tonumber(v.Rate.Text:split("x")[1])
+                firesignal(v.MouseButton1Down)
+            end
+        end
+    end
+end
+
+spawn(function()
+    while task.wait(1) do 
+        if toggles.autobestalgorithm == true then 
+            choosebest()
+        end
+    end
+end)
+
