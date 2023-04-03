@@ -1,0 +1,21 @@
+
+function getshopversion(name)
+    for i, v in pairs(game:GetService("Workspace").Shops:GetChildren()) do 
+        for i2, v2 in pairs(v.Shows:GetChildren()) do 
+            if tonumber(v2.Name) then
+                if v2:GetChildren()[1].Name == name then 
+                    return v2
+                end
+            end
+        end
+    end
+end
+
+function buycards(name, amount)
+    local buyevent = game:GetService("ReplicatedStorage").Events.BuyCard
+    
+    buyevent:FireServer(name, getshopversion(name), amount)
+end
+
+
+buycards("Chypset Dragon 100", 10)
