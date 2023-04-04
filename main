@@ -7,12 +7,14 @@ local Window = Library.CreateLib("Bitcoin Miner Gui by RoSploits", "DarkTheme")
 
 local tabs = {
     main = Window:NewTab("main"),
+    autobuy = Window:NewTab("AutoBuy"),
     teleport = Window:NewTab("teleport"),
     credits = Window:NewTab("credits")
 }
 
 local sections = {
     autofarm = tabs.main:NewSection("AutoFarm"),
+    autobuy = tab.autobuy:NewSection("Buy GPU'S"),
     teleport = tabs.teleport:NewSection("Teleports")
 }
 
@@ -27,12 +29,23 @@ local toggles = {
     autobestalgorithm = false
 }
 
+-- funcs
+
+function getlistofgpus()
+    
+end
 
 -- Main 
 
-sections.autofarm:NewToggle("Auto Choose Best Algorithm", "Automatically uses the best algorithm for maxium profit", function(toggle) 
-    toggles.autobestalgorithm = toggle
+sections.autobuy:NewSlider("Amount", "Amount of gpu's to purchase", 100, 1, function(amt)
+    
 end)
+
+
+
+-- AutoBuy
+
+sections.autobuy:New")
 
 -- Teleport 
 
