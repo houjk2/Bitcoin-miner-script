@@ -1,4 +1,5 @@
 
+
 local players = game:GetService("Players")
 local player = players.LocalPlayer
 
@@ -14,15 +15,14 @@ local tabs = {
 
 local sections = {
     autofarm = tabs.main:NewSection("AutoFarm"),
-    autobuy = tab.autobuy:NewSection("Buy GPU'S"),
+    autobuy = tabs.autobuy:NewSection("Buy GPU'S"),
     teleport = tabs.teleport:NewSection("Teleports")
 }
 
 local teleportpos = {
     spawn = CFrame.new(153, 7, 93),
     future = CFrame.new(-144, 27, 13864),
-    hsvshop = CFrame.new(40, 7, -1085),
-    
+    hsvshop = CFrame.new(40, 7, -1085)
 }
 
 local toggles = {
@@ -55,19 +55,37 @@ function buycards(name, amount)
 end
 
 function getlistofgpus()
+    local nametable = {}
+    for i, v in pairs(game:GetService("Workspace").Shops:GetChildren()) do 
+        if v:FindFirstChild("Shows") then
+            for i2, v2 in pairs(v.Shows:GetChildren()) do 
+                if v2.ClassName == "Model" then 
+                    for i3, v3 in pairs(v2:GetChildren()) do 
+                        if v3.ClassName == "Model" then
+                            table.insert(nametable, v3.Name)
+                        end
+                    end
+                end
+            end
+        end
+    end
     
+    return nametable
 end
 
 
 -- Main 
 
-sections.autofarm:NewToggle()
+sections.autofarm:NewToggle("Auto Choose Best Algorithm", "Automatically uses the best algorithm for maxium profit", function(toggle) 
+    toggles.autobestalgorithm = toggle
+end)
 
 -- AutoBuy
 
 sections.autobuy:NewSlider("Amount", "Amount of GPU's to purchase", 100, 1, function(amt)
     values.gpuamt = amt
 end)
+
 
 sections.autobuy:NewDropdown("Select GPU", "Select the GPU to buy", getlistofgpus(), function(selection) 
     values.gputobuy = selection
@@ -138,4 +156,5 @@ spawn(function()
         end
     end
 end)
+
 
