@@ -29,23 +29,56 @@ local toggles = {
     autobestalgorithm = false
 }
 
+local values = {
+    gputobuy = "",
+    gpuamt = 1
+}
+
 -- funcs
+
+function getshopversion(name)
+    for i, v in pairs(game:GetService("Workspace").Shops:GetChildren()) do 
+        for i2, v2 in pairs(v.Shows:GetChildren()) do 
+            if tonumber(v2.Name) then
+                if v2:GetChildren()[1].Name == name then 
+                    return v2
+                end
+            end
+        end
+    end
+end
+
+function buycards(name, amount)
+    local buyevent = game:GetService("ReplicatedStorage").Events.BuyCard
+    
+    buyevent:FireServer(name, getshopversion(name), amount)
+end
 
 function getlistofgpus()
     
 end
 
+
 -- Main 
 
-sections.autobuy:NewSlider("Amount", "Amount of gpu's to purchase", 100, 1, function(amt)
-    
-end)
-
-
+sections.autofarm:NewToggle()
 
 -- AutoBuy
 
-sections.autobuy:New")
+sections.autobuy:NewSlider("Amount", "Amount of GPU's to purchase", 100, 1, function(amt)
+    values.gpuamt = amt
+end)
+
+sections.autobuy:NewDropdown("Select GPU", "Select the GPU to buy", getlistofgpus(), function(selection) 
+    values.gputobuy = selection
+end)
+
+sections.autobuy:NewButton("Purchase", "Attempts to buy the selected GPU's", function()
+    if values.gputobuy ~= "" then
+        buycards(values.gputobuy, values.gpuamt)
+    end
+end)
+
 
 -- Teleport 
 
