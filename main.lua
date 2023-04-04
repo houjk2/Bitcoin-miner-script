@@ -7,16 +7,20 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHept
 local Window = Library.CreateLib("Bitcoin Miner Gui by RoSploits", "DarkTheme")
 
 local tabs = {
-    main = Window:NewTab("main"),
+    main = Window:NewTab("Main"),
+    autofarm = Window:NewTab("AutoFarm"),
     autobuy = Window:NewTab("AutoBuy"),
-    teleport = Window:NewTab("teleport"),
-    credits = Window:NewTab("credits")
+    teleport = Window:NewTab("Teleport"),
+    credits = Window:NewTab("Credits")
 }
 
 local sections = {
-    autofarm = tabs.main:NewSection("AutoFarm"),
-    autobuy = tabs.autobuy:NewSection("Buy GPU'S"),
-    teleport = tabs.teleport:NewSection("Teleports")
+    player = tabs.main:NewSection("Player"),
+    sell = tabs.main:NewSection("Sell Crypto"),
+    autofarm = tabs.autofarm:NewSection("AutoFarm"),
+    autobuy = tabs.autobuy:NewSection("Buy Items"),
+    teleport = tabs.teleport:NewSection("Teleports"),
+    credits = tabs.credits:NewSection("Credits")
 }
 
 local teleportpos = {
@@ -26,7 +30,8 @@ local teleportpos = {
 }
 
 local toggles = {
-    autobestalgorithm = false
+    autobestalgorithm = false,
+    autosell = false
 }
 
 local values = {
@@ -73,11 +78,56 @@ function getlistofgpus()
     return nametable
 end
 
+function sellcrypto(name)
+    if name == "bitcoin" then 
+        if player.Character then
+            for i = 1, 10, 1 do 
+                local oldc = player.Character.HumanoidRootPart.CFrame
+                player.Character.HumanoidRootPart.CFrame = CFrame.new(156, 7, 96)
+                wait()
+                game:GetService("ReplicatedStorage").Events.ExchangeMoney:FireServer(true)
+                wait()
+                player.Character.HumanoidRootPart.CFrame = oldc
+            end
+        end
+    elseif name == "solaris" then
+        if player.Character then
+            for i = 1, 10, 1 do 
+                local oldc = player.Character.HumanoidRootPart.CFrame
+                player.Character.HumanoidRootPart.CFrame = CFrame.new(156, 7, 96)
+                wait()
+                game:GetService("ReplicatedStorage").Events.ExchangeMoney:FireServer(false)
+                wait()
+                player.Character.HumanoidRootPart.CFrame = oldc
+            end
+        end
+    end
+end
 
 -- Main 
 
+sections.player:NewSlider("Walkspeed", "Sets your walkspeed", 200, 16, function(amt)
+    if player.Character then 
+        player.Character.Humanoid.WalkSpeed = amt
+    end
+end)
+
+sections.sell:NewButton("Sell Bitcoin", "Sells your Bitcoin", function() 
+    sellcrypto("bitcoin")
+end)
+
+sections.sell:NewButton("Sell Solaris", "Sells your Solaris", function() 
+    sellcrypto("solaris")
+end)
+
+-- AutoFarm 
+
 sections.autofarm:NewToggle("Auto Choose Best Algorithm", "Automatically uses the best algorithm for maxium profit", function(toggle) 
     toggles.autobestalgorithm = toggle
+end)
+
+sections.autofarm:NewToggle("Auto Sell Crypto", "Automatically sells your crypto for money", function(toggle) 
+    toggles.autosell = toggle
 end)
 
 -- AutoBuy
@@ -126,6 +176,12 @@ sections.teleport:NewButton("To Plot", "Teleport to your activated plot", functi
     end
 end)
 
+-- Credits
+
+sections.credits:NewKeybind("Toggle Ui", "Open and Close the UI", Enum.KeyCode.RightShift, function()
+	Library:ToggleUI()
+end)
+
 -- funcs
 
 function choosebest()
@@ -149,6 +205,19 @@ function choosebest()
     end
 end
 
+-- autosell
+spawn(function() 
+    while task.wait(1) do
+        if toggles.autosell == true then 
+            sellcrypto("bitcoin")
+            task.wait(10)
+            sellcrypto("solaris")
+            task.wait(9)
+        end
+    end
+end)
+
+-- auto algorithm
 spawn(function()
     while task.wait(1) do 
         if toggles.autobestalgorithm == true then 
