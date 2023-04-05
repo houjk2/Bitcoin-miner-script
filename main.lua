@@ -1,6 +1,5 @@
 
 
-
 local players = game:GetService("Players")
 local player = players.LocalPlayer
 
@@ -17,6 +16,7 @@ local tabs = {
 
 local sections = {
     player = tabs.main:NewSection("Player"),
+    openshops = tabs.main:NewSection("Open Shop"),
     sell = tabs.main:NewSection("Sell Crypto"),
     autofarm = tabs.autofarm:NewSection("AutoFarm"),
     autobuy = tabs.autobuy:NewSection("Buy Items"),
@@ -41,6 +41,17 @@ local values = {
 }
 
 -- funcs
+
+function getshopsnames()
+    local shops = {}
+    for i, v in pairs(game:GetService("Workspace").Shops:GetChildren()) do 
+        if v.ClassName == "Model" then 
+            table.insert(shops, v.Name)
+        end
+    end
+    
+    return shops
+end
 
 function scientifictonum(scientificNum)
     local fullNum = tonumber(scientificNum)
@@ -142,6 +153,18 @@ sections.player:NewSlider("Walkspeed", "Sets your walkspeed", 200, 16, function(
     if player.Character then 
         player.Character.Humanoid.WalkSpeed = amt
     end
+end)
+
+sections.openshops:NewDropdown("Select Shop", "Select the shop to open", getshopsnames(), function(option)
+    game:GetService("ReplicatedStorage").LEvents.OpenShop:Fire(game:GetService("Workspace").Shops[option].Shows, true)
+    spawn(function()
+        for i = 1, 100, 1 do 
+            task.wait(0.01)
+            keypress(0x45)
+            task.wait(0.1)
+            keyrelease(0x45)
+        end
+    end)
 end)
 
 sections.sell:NewButton("Sell Bitcoin", "Sells your Bitcoin", function() 
