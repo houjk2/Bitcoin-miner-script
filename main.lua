@@ -41,6 +41,33 @@ local values = {
 
 -- funcs
 
+function scientifictonum(scientificNum)
+    local fullNum = tonumber(scientificNum)
+
+    while fullNum == nil do
+        local exponentPos = scientificNum:find("e")
+        local baseNum = tonumber(scientificNum:sub(1, exponentPos-1))
+        local exponent = tonumber(scientificNum:sub(exponentPos+1))
+        fullNum = baseNum * 10^exponent
+    end
+
+    return fullNum
+end
+
+function abbreviatenumber(firstv)
+    local numb = firstv
+    if type(firstv) == "string" then
+        numb = scientifictonum(firstv)
+    end
+    local abbrev = {"", "K", "M", "B", "T", "QD", "QT", "SX", "SP", "O", "N", "D"}
+    local i = 1
+    while numb >= 1000 and i < #abbrev do
+        numb = numb / 1000
+        i = i + 1
+    end
+    return string.format("%.1f%s", numb, abbrev[i])
+end
+
 function getshopversion(name)
     for i, v in pairs(game:GetService("Workspace").Shops:GetChildren()) do 
         for i2, v2 in pairs(v.Shows:GetChildren()) do 
@@ -67,7 +94,11 @@ function getlistofgpus()
                 if v2.ClassName == "Model" then 
                     for i3, v3 in pairs(v2:GetChildren()) do 
                         if v3.ClassName == "Model" then
-                            table.insert(nametable, v3.Name)
+                            if v3:FindFirstChild("Price") then 
+                                table.insert(nametable, v3.Name.."  |  "..abbreviatenumber(v3.Price.Value))
+                            elseif v3:FindFirstChild("SPrice") then
+                                table.insert(nametable, v3.Name.."  |  S"..abbreviatenumber(v3.SPrice.Value))
+                            end
                         end
                     end
                 end
@@ -225,5 +256,4 @@ spawn(function()
         end
     end
 end)
-
 
