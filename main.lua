@@ -18,6 +18,7 @@ local sections = {
     player = tabs.main:NewSection("Player"),
     openshops = tabs.main:NewSection("Open Shop"),
     sell = tabs.main:NewSection("Sell Crypto"),
+    others = tabs.main:NewSection("Others"),
     autofarm = tabs.autofarm:NewSection("AutoFarm"),
     autobuy = tabs.autobuy:NewSection("Buy Items"),
     teleport = tabs.teleport:NewSection("Teleports"),
@@ -152,6 +153,21 @@ end
 sections.player:NewSlider("Walkspeed", "Sets your walkspeed", 200, 16, function(amt)
     if player.Character then 
         player.Character.Humanoid.WalkSpeed = amt
+    end
+end)
+
+sections.player:NewButton("Redeem codes", "Redeems most codes found", function()
+    local codeslist = {}
+    for i, v in pairs(game:GetService("Workspace").Codes:GetChildren()) do 
+        table.insert(codeslist, v.SurfaceGui.SIGN.Text:split(" ")[2])
+    end
+    
+    fireproximityprompt(game:GetService("Workspace").Codes["Meshes/INviter Friends_Plane.008"].ProximityPrompt)
+    
+    for i, v in pairs(codeslist) do 
+        localplayer.PlayerGui.NewUi.Codes.CodesContainer.Input.Value.Text = v
+        task.wait(1)
+        firesignal(player.PlayerGui.NewUi.Codes.CodesContainer.Enter.MouseButton1Down)
     end
 end)
 
