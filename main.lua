@@ -1,5 +1,6 @@
 
 
+
 local players = game:GetService("Players")
 local player = players.LocalPlayer
 
@@ -169,7 +170,8 @@ end)
 
 
 sections.autobuy:NewDropdown("Select GPU", "Select the GPU to buy", getlistofgpus(), function(selection) 
-    values.gputobuy = selection
+    print(selection:split("|")[1]:split("  ")[1])
+    values.gputobuy = selection:split("|")[1]:split("  ")[1]
 end)
 
 sections.autobuy:NewButton("Purchase", "Attempts to buy the selected GPU's", function()
@@ -256,4 +258,5 @@ spawn(function()
         end
     end
 end)
+
 
