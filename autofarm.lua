@@ -1,4 +1,6 @@
 
+local player = game:GetService("Players").LocalPlayer
+
 function proccesnum(before, isradon)
     if type(before) == "number" and tostring(number):find(".") then
         if tostring(before):find("e") then
@@ -16,71 +18,11 @@ function proccesnum(before, isradon)
 end
 
 
-local function Print(tbl, label, deepPrint)
-
-	assert(type(tbl) == "table", "First argument must be a table")
-	assert(label == nil or type(label) == "string", "Second argument must be a string or nil")
-	
-	label = (label or "TABLE")
-	
-	local strTbl = {}
-	local indent = " - "
-	
-	-- Insert(string, indentLevel)
-	local function Insert(s, l)
-		strTbl[#strTbl + 1] = (indent:rep(l) .. s .. "\n")
-	end
-	
-	local function AlphaKeySort(a, b)
-		return (tostring(a.k) < tostring(b.k))
-	end
-	
-	local function PrintTable(t, lvl, lbl)
-		Insert(lbl .. ":", lvl - 1)
-		local nonTbls = {}
-		local tbls = {}
-		local keySpaces = 0
-		for k,v in pairs(t) do
-			if (type(v) == "table") then
-				table.insert(tbls, {k = k, v = v})
-			else
-				table.insert(nonTbls, {k = k, v = "[" .. typeof(v) .. "] " .. tostring(v)})
-			end
-			local spaces = #tostring(k) + 1
-			if (spaces > keySpaces) then
-				keySpaces = spaces
-			end
-		end
-		table.sort(nonTbls, AlphaKeySort)
-		table.sort(tbls, AlphaKeySort)
-		for _,v in ipairs(nonTbls) do
-			Insert(tostring(v.k) .. ":" .. (" "):rep(keySpaces - #tostring(v.k)) .. v.v, lvl)
-		end
-		if (deepPrint) then
-			for _,v in ipairs(tbls) do
-				PrintTable(v.v, lvl + 1, tostring(v.k) .. (" "):rep(keySpaces - #tostring(v.k)) .. " [Table]")
-			end
-		else
-			for _,v in ipairs(tbls) do
-				Insert(tostring(v.k) .. ":" .. (" "):rep(keySpaces - #tostring(v.k)) .. "[Table]", lvl)
-			end
-		end
-	end
-	
-	PrintTable(tbl, 1, label)
-	
-	print(table.concat(strTbl, ""))
-	
-end
-
 mytable = {bitcoin = {}, solaris = {}}
 
 for i, v in pairs(game:GetService("ReplicatedStorage").Objects:GetChildren()) do 
     if v.Class and v.Class.Value == "Card" and v:FindFirstChild("Limited") == nil then 
         if v:FindFirstChild("bps") then
-            if v.Name == "Radon 6000" then 
-                proccesnum(tonumber(v.bps.Value) / v.Price.Value, true)
-            end
             mytable.bitcoin[v.Name] = {
                 price = tonumber(v.Price.Value),
                 bps = tonumber(v.bps.Value),
@@ -91,6 +33,112 @@ for i, v in pairs(game:GetService("ReplicatedStorage").Objects:GetChildren()) do
     end
 end
 
-writefile("gpudata.json", game:GetService("HttpService"):JSONEncode(mytable))
+function getshopversion(name)
+    for i, v in pairs(game:GetService("Workspace").Shops:GetChildren()) do 
+        for i2, v2 in pairs(v.Shows:GetChildren()) do 
+            if tonumber(v2.Name) then
+                if v2:GetChildren()[1].Name == name then 
+                    return v2
+                end
+            end
+        end
+    end
+end
 
-Print(mytable, "my table ok", true)
+function getbps()
+    return player.Bps.Value + player.Bps2.Value + player.Bps3.Value + player.Bps4.Value
+end
+
+function bitcointomoney(btc)
+    return btc * tonumber(player.PlayerGui.NewUi.ExchangeUI.Values.Rate.Text:split(" ")[4])
+end
+
+function buycards(name, amount)
+    local buyevent = game:GetService("ReplicatedStorage").Events.BuyCard
+    
+    buyevent:FireServer(name, getshopversion(name), amount)
+end
+
+function sellcrypto(name)
+    if name == "bitcoin" then 
+        if player.Character then
+            for i = 1, 10, 1 do 
+                local oldc = player.Character.HumanoidRootPart.CFrame
+                player.Character.HumanoidRootPart.CFrame = CFrame.new(156, 7, 96)
+                wait()
+                game:GetService("ReplicatedStorage").Events.ExchangeMoney:FireServer(true)
+                wait()
+                player.Character.HumanoidRootPart.CFrame = oldc
+            end
+        end
+    elseif name == "solaris" then
+        if player.Character then
+            for i = 1, 10, 1 do 
+                local oldc = player.Character.HumanoidRootPart.CFrame
+                player.Character.HumanoidRootPart.CFrame = CFrame.new(156, 7, 96)
+                wait()
+                game:GetService("ReplicatedStorage").Events.ExchangeMoney:FireServer(false)
+                wait()
+                player.Character.HumanoidRootPart.CFrame = oldc
+            end
+        end
+    end
+end
+
+function calculatenextcard()
+    local pricetarget = bitcointomoney(getbps()) * 120
+    local minimumprice = bitcointomoney(getbps()) * 60
+    local options = {}
+    
+    local bestcardname = ""
+    local bestcardbtcperprice = 0
+    
+    for i, v in pairs(mytable.bitcoin) do
+        if v.price > minimumprice and v.price < pricetarget then
+            options[i] = v
+        end
+    end
+    
+    for i, v in pairs(options) do 
+        if v.btcperprice > bestcardbtcperprice then 
+            bestcardname = i
+        end
+    end
+    
+    return bestcardname
+end
+
+
+function check()
+    local nextcard = calculatenextcard()
+    
+    if calculatenextcard() == nil then
+        return 
+    end
+    print("Buying", nextcard)
+    buycards(calculatenextcard(), 1)
+    
+    wait(1)
+    for i, v in pairs(game:GetService("Workspace").Buildings[player.Name]:GetChildren()) do 
+        if v:FindFirstChild("Cards") then 
+            for i2, v2 in pairs(v.Cards:GetChildren()) do
+                local canexecute = true
+                for i3, v3 in pairs(v2:GetChildren()) do 
+                    if v3.ClassName == "Model" then 
+                        canexecute = false
+                    end
+                end
+                if canexecute then
+                    game:GetService("ReplicatedStorage").Events.PlaceCard:FireServer(nextcard, v2)
+                end
+            end
+        end
+    end
+end
+
+spawn(function()
+    while wait(1) do
+        sellcrypto("bitcoin")
+        check()
+    end
+end)
