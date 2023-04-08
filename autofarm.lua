@@ -86,8 +86,8 @@ function sellcrypto(name)
 end
 
 function calculatenextcard()
-    local pricetarget = bitcointomoney(getbps()) * 120
-    local minimumprice = bitcointomoney(getbps()) * 60
+    local pricetarget = bitcointomoney(getbps()) * 300
+    local minimumprice = bitcointomoney(getbps()) * 30
     local options = {}
     
     local bestcardname = ""
