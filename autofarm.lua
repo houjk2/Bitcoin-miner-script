@@ -1,4 +1,6 @@
 
+
+
 local player = game:GetService("Players").LocalPlayer
 
 function proccesnum(before, isradon)
@@ -136,9 +138,31 @@ function check()
     end
 end
 
+function choosebest()
+    local highest = 0
+    
+    for i, v in pairs(player.PlayerGui.NewUi.UiButtons.SubButtonsContainer.SubButtonsMenu.Algorithms.AlgStore:GetChildren()) do 
+        if v.ClassName == "TextButton" then 
+            if tonumber(v.Rate.Text:split("x")[1]) > highest then
+                highest = tonumber(v.Rate.Text:split("x")[1])
+            end
+        end
+    end
+    
+    for i, v in pairs(player.PlayerGui.NewUi.UiButtons.SubButtonsContainer.SubButtonsMenu.Algorithms.AlgStore:GetChildren()) do 
+        if v.ClassName == "TextButton" then 
+            if tonumber(v.Rate.Text:split("x")[1]) == highest then
+                highest = tonumber(v.Rate.Text:split("x")[1])
+                firesignal(v.MouseButton1Down)
+            end
+        end
+    end
+end
+
 spawn(function()
     while wait(1) do
         sellcrypto("bitcoin")
+        pcall(choosebest)
         check()
     end
 end)
