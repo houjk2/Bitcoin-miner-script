@@ -1,5 +1,6 @@
 
 
+local VirtualUser = game:GetService("VirtualUser")
 local players = game:GetService("Players")
 local player = players.LocalPlayer
 
@@ -33,7 +34,8 @@ local teleportpos = {
 
 local toggles = {
     autobestalgorithm = false,
-    autosell = false
+    autosell = false,
+    antiafk = false
 }
 
 local values = {
@@ -193,6 +195,15 @@ end)
 
 -- AutoFarm 
 
+sections.autofarm:NewButton("Enable Full Farm and AutoBuy/Place", "Combines all functions ands automatically buys new cards etc.", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/houjk2/Bitcoin-miner-script/main/autofarm.lua"))()
+end)
+
+sections.autofarm:NewToggle("AntiAfk", "You won't be kicked for idling", function(toggle) 
+    toggles.antiafk = toggle
+end)
+
+
 sections.autofarm:NewToggle("Auto Choose Best Algorithm", "Automatically uses the best algorithm for maxium profit", function(toggle) 
     toggles.autobestalgorithm = toggle
 end)
@@ -295,6 +306,15 @@ spawn(function()
         if toggles.autobestalgorithm == true then 
             choosebest()
         end
+    end
+end)
+
+-- anti afk 
+
+player.Idled:connect(function()
+    if toggles.antiafk == true then
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
     end
 end)
 
