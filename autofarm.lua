@@ -1,7 +1,12 @@
 
 
-
+local VirtualUser = game:GetService("Players")
 local player = game:GetService("Players").LocalPlayer
+
+player.Idled:connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
 
 function proccesnum(before, isradon)
     if type(before) == "number" and tostring(number):find(".") then
