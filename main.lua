@@ -197,6 +197,11 @@ end)
 
 sections.autofarm:NewButton("Enable Full Farm and AutoBuy/Place", "Combines all functions ands automatically buys new cards etc.", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/houjk2/Bitcoin-miner-script/main/autofarm.lua"))()
+	game:GetService("StarterGui"):SetCore("SendNotification",{
+	Title = "AutoFarm initiated",
+	Text = "AutoFarm succesfully executed please refrain from using autofarm toggles from now on",
+	Duration = 4
+    })
 end)
 
 sections.autofarm:NewToggle("AntiAfk", "You won't be kicked for idling", function(toggle) 
