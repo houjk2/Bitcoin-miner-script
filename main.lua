@@ -266,6 +266,11 @@ end)
 
 -- Credits
 
+sections.credits:NewButton("Copy channel link", "Copies my YouTube channel URL", function()
+	setclipboard("https://www.youtube.com/channel/UCOe-TPSJcvGlutJ40fWvXlw")
+end)
+
+
 sections.credits:NewKeybind("Toggle Ui", "Open and Close the UI", Enum.KeyCode.RightShift, function()
 	Library:ToggleUI()
 end)
@@ -322,5 +327,4 @@ player.Idled:connect(function()
         VirtualUser:ClickButton2(Vector2.new())
     end
 end)
-
 
