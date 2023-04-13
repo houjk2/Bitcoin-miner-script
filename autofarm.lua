@@ -8,6 +8,65 @@ player.Idled:connect(function()
     VirtualUser:ClickButton2(Vector2.new())
 end)
 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/houjk2/Bitcoin-miner-script/main/farmstatus.lua"))()
+
+
+
+function changeinfo(infotype, txt, inmediate)
+    inmediate = inmediate or false
+    
+    if inmediate == true then 
+        if infotype == "gputarget" then 
+            player.PlayerGui.notif.gputarget.TextLabel.Text = txt
+        end
+        if infotype == "notification" then 
+            player.PlayerGui.notif.notification.TextLabel.Text = txt
+        end
+        
+        return
+    end
+    
+    if infotype == "gputarget" then 
+        local splitted = txt:split("")
+        player.PlayerGui.notif.gputarget.TextLabel.Text = ""
+        
+        for i, v in pairs(splitted) do
+            player.PlayerGui.notif.gputarget.TextLabel.Text = player.PlayerGui.notif.gputarget.TextLabel.Text..v
+            task.wait(0.01)
+        end
+    end
+    
+    if infotype == "notification" then 
+        local splitted = txt:split("")
+        player.PlayerGui.notif.notification.TextLabel.Text = ""
+        for i, v in pairs(splitted) do 
+            player.PlayerGui.notif.notification.TextLabel.Text = player.PlayerGui.notif.notification.TextLabel.Text..v
+            task.wait(0.01)
+        end
+    end
+end
+
+for i, v in pairs(game:GetService("Workspace"):GetChildren()) do 
+    if v:FindFirstChild("Owned") then 
+        if v.Owned.Value == true then 
+            if v.Sign.wr.SurfaceGui.Text.Text == player.Name.."'s plot" then 
+                if player.Character then 
+                    player.Character.HumanoidRootPart.CFrame = v.Frame.CFrame * CFrame.new(0, 20, 0)
+                end
+            end
+        end
+    end
+end
+
+changeinfo("notification", "Please stay at your plot")
+changeinfo("gputarget", "Please stay at your plot")
+
+wait(2)
+
+changeinfo("notification", "Getting card information..")
+
+wait(1)
+
 function proccesnum(before, isradon)
     if type(before) == "number" and tostring(number):find(".") then
         if tostring(before):find("e") then
@@ -40,9 +99,14 @@ for i, v in pairs(game:GetService("ReplicatedStorage").Objects:GetChildren()) do
     end
 end
 
+changeinfo("notification", 'Got card information...')
+wait(1)
+changeinfo("notification", 'Starting..')
+wait(0.5)
+
 function getshopversion(name)
     for i, v in pairs(game:GetService("Workspace").Shops:GetChildren()) do 
-        for i2, v2 in pairs(v.Shows:GetChildren()) do 
+        for i2, v2 in pairs(v.Shows:GetChildren()) do
             if tonumber(v2.Name) then
                 if v2:GetChildren()[1].Name == name then 
                     return v2
@@ -68,6 +132,7 @@ end
 
 function sellcrypto(name)
     if name == "bitcoin" then 
+        changeinfo("notification", "selling bitcoin")
         if player.Character then
             for i = 1, 10, 1 do 
                 local oldc = player.Character.HumanoidRootPart.CFrame
@@ -78,7 +143,9 @@ function sellcrypto(name)
                 player.Character.HumanoidRootPart.CFrame = oldc
             end
         end
+        changeinfo("notification", "Sold")
     elseif name == "solaris" then
+        changeinfo("notification", "selling solaris")
         if player.Character then
             for i = 1, 10, 1 do 
                 local oldc = player.Character.HumanoidRootPart.CFrame
@@ -89,6 +156,7 @@ function sellcrypto(name)
                 player.Character.HumanoidRootPart.CFrame = oldc
             end
         end
+        changeinfo("notification", "Sold")
     end
 end
 
@@ -112,6 +180,24 @@ function calculatenextcard()
         end
     end
     
+    if bestcardname == "" then 
+        pricetarget = bitcointomoney(getbps()) * 2000
+        minimumprice = bitcointomoney(getbps()) * 3
+        
+        for i, v in pairs(mytable.bitcoin) do
+            if v.price > minimumprice and v.price < pricetarget then
+                options[i] = v
+            end
+        end
+    
+        for i, v in pairs(options) do 
+            if v.btcperprice > bestcardbtcperprice then 
+                bestcardname = i
+            end
+        end
+    end
+    
+    
     return bestcardname
 end
 
@@ -119,10 +205,10 @@ end
 function check()
     local nextcard = calculatenextcard()
     
-    if calculatenextcard() == nil then
+    if calculatenextcard() == "" then
         return 
     end
-    print("Buying", nextcard)
+    changeinfo("gputarget", "Next GPU Target: "..calculatenextcard(), true)
     buycards(calculatenextcard(), 1)
     
     wait(1)
